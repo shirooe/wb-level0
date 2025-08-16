@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS "Order" (
+CREATE TABLE IF NOT EXISTS orders (
   "order_uid" varchar primary key,
   "track_number" varchar,
   "entry" varchar,
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS "Order" (
   "oof_shard" varchar
 );
 
-CREATE TABLE IF NOT EXISTS "Delivery" (
+CREATE TABLE IF NOT EXISTS delivery (
   "order_uid" varchar primary key,
   "name" varchar,
   "phone" varchar,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS "Delivery" (
   "email" varchar
 );
 
-CREATE TABLE IF NOT EXISTS "Payment" (
+CREATE TABLE IF NOT EXISTS payment (
   "order_uid" varchar primary key,
   "transaction" varchar,
   "request_id" varchar,
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS "Payment" (
   "custom_fee" int
 );
 
-CREATE TABLE IF NOT EXISTS "Items" (
+CREATE TABLE IF NOT EXISTS items (
   "order_uid" varchar primary key,
   "chrt_id" int,
   "track_number" varchar,
@@ -52,8 +52,8 @@ CREATE TABLE IF NOT EXISTS "Items" (
   "status" int
 );
 
-ALTER TABLE "Delivery" ADD FOREIGN KEY ("order_uid") REFERENCES "Order" ("order_uid");
+ALTER TABLE delivery ADD FOREIGN KEY ("order_uid") REFERENCES orders ("order_uid");
 
-ALTER TABLE "Payment" ADD FOREIGN KEY ("order_uid") REFERENCES "Order" ("order_uid");
+ALTER TABLE payment ADD FOREIGN KEY ("order_uid") REFERENCES orders ("order_uid");
 
-ALTER TABLE "Items" ADD FOREIGN KEY ("order_uid") REFERENCES "Order" ("order_uid");
+ALTER TABLE items ADD FOREIGN KEY ("order_uid") REFERENCES orders ("order_uid");

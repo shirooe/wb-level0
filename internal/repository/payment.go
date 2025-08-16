@@ -1,0 +1,39 @@
+package repository
+
+import (
+	"context"
+	"wb-level0/internal/database"
+	"wb-level0/internal/models"
+
+	"github.com/elgris/sqrl"
+)
+
+type Payment struct {
+	db *database.Client
+}
+
+func NewPaymentRepository(db *database.Client) *Payment {
+	return &Payment{
+		db: db,
+	}
+}
+
+func (o *Payment) Create(ctx context.Context, orderID string, payment models.Payment) (string, error) {
+	sql, args, err := sqrl.Insert("payment").PlaceholderFormat(sqrl.Dollar).Columns("order_uid", "transaction", "request_id", "currency", "provider",
+		"amount", "payment_dt", "bank", "delivery_cost", "goods_total", "custom_fee").
+		Values(orderID, payment.Transaction, payment.RequestID, payment.Currency, payment.Provider,
+			payment.Amount, payment.PaymentDt, payment.Bank, payment.DeliveryCost, payment.GoodsTotal, payment.CustomFee).
+		ToSql()
+
+	if err != nil {
+		return "", err
+	}
+
+	query := database.Query{
+		Name:     "CreatePayment",
+		QueryRaw: sql,
+	}
+
+	o.db.DB().QueryRowContext(ctx, query, args...)
+	return orderID, nil
+}
