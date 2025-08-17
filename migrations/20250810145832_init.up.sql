@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS orders (
   "customer_id" varchar,
   "delivery_service" varchar,
   "shardkey" varchar,
-  "sm_id" varchar,
+  "sm_id" int,
   "date_created" timestamp,
   "oof_shard" varchar
 );
