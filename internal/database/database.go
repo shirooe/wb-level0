@@ -8,10 +8,10 @@ import (
 
 type Client struct {
 	db     DB
-	config Config
+	config *Config
 }
 
-func New(ctx context.Context, cfg *Config) (*Client, error) {
+func ProvideClient(ctx context.Context, cfg *Config) (*Client, error) {
 	conn, err := pgxpool.New(ctx, cfg.DSN())
 
 	if err != nil {
@@ -20,7 +20,7 @@ func New(ctx context.Context, cfg *Config) (*Client, error) {
 
 	return &Client{
 		db:     pg(conn),
-		config: *cfg,
+		config: cfg,
 	}, nil
 }
 

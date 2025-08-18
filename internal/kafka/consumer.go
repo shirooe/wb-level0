@@ -2,6 +2,10 @@ package kafka
 
 import (
 	"context"
+	"fmt"
+	"io"
+	"log"
+	"wb-level0/internal/service"
 
 	"github.com/segmentio/kafka-go"
 )
@@ -9,9 +13,11 @@ import (
 type Consumer struct {
 	ctx    context.Context
 	reader *kafka.Reader
+
+	service *service.WBLevel0Service
 }
 
-func NewConsumer(ctx context.Context, cfg *Config) *Consumer {
+func ProvideConsumer(ctx context.Context, cfg *Config, service *service.WBLevel0Service) *Consumer {
 	return &Consumer{
 		ctx: ctx,
 		reader: kafka.NewReader(kafka.ReaderConfig{
@@ -21,11 +27,33 @@ func NewConsumer(ctx context.Context, cfg *Config) *Consumer {
 			Topic:     cfg.Topic,
 			MaxBytes:  cfg.MaxBytes,
 		}),
+		service: service,
 	}
 }
 
-func (c *Consumer) Read() (kafka.Message, error) {
-	return c.reader.ReadMessage(c.ctx)
+func (c *Consumer) Fetch() (kafka.Message, error) {
+	return c.reader.FetchMessage(c.ctx)
+}
+
+func (c *Consumer) Consume() {
+	for {
+		msg, err := c.Fetch()
+		if err != nil {
+			if err == context.Canceled || err == io.EOF {
+				// TODO: consumer was closed
+				log.Printf("consumer stopped: %v", err)
+				return
+			}
+			log.Printf("failed to read message: %v", err)
+			continue
+		}
+
+		fmt.Printf("message: %s\n", msg.Value)
+
+		if err := c.Commit(); err != nil {
+			log.Printf("failed to commit message: %v", err)
+		}
+	}
 }
 
 func (c *Consumer) Commit() error {

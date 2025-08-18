@@ -8,17 +8,7 @@ import (
 	"github.com/elgris/sqrl"
 )
 
-type Payment struct {
-	db *database.Client
-}
-
-func NewPaymentRepository(db *database.Client) *Payment {
-	return &Payment{
-		db: db,
-	}
-}
-
-func (o *Payment) Create(ctx context.Context, orderID string, payment models.Payment) (string, error) {
+func (r *repository) CreatePayment(ctx context.Context, orderID string, payment models.Payment) (string, error) {
 	sql, args, err := sqrl.Insert("payment").PlaceholderFormat(sqrl.Dollar).Columns("order_uid", "transaction", "request_id", "currency", "provider",
 		"amount", "payment_dt", "bank", "delivery_cost", "goods_total", "custom_fee").
 		Values(orderID, payment.Transaction, payment.RequestID, payment.Currency, payment.Provider,
@@ -34,6 +24,6 @@ func (o *Payment) Create(ctx context.Context, orderID string, payment models.Pay
 		QueryRaw: sql,
 	}
 
-	o.db.DB().QueryRowContext(ctx, query, args...)
+	r.db.DB().QueryRowContext(ctx, query, args...)
 	return orderID, nil
 }

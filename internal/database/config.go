@@ -2,19 +2,28 @@ package database
 
 import (
 	"fmt"
+	"log"
 	"os"
+
+	"go.uber.org/config"
 )
 
 type Config struct {
-	Host string
-	Port string
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	Name     string `yaml:"name"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
 }
 
-func NewConfig(host, port string) *Config {
-	return &Config{
-		Host: host,
-		Port: port,
+func ProvideConfig(provider *config.YAML) *Config {
+	var cfg Config
+
+	if err := provider.Get("database").Populate(&cfg); err != nil {
+		log.Fatalf("[Database] Ошибка конфигурации: %v", err)
 	}
+
+	return &cfg
 }
 
 func (c *Config) DSN() string {
