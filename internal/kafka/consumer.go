@@ -2,7 +2,6 @@ package kafka
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"log"
 	"wb-level0/internal/service"
@@ -11,7 +10,6 @@ import (
 )
 
 type Consumer struct {
-	ctx    context.Context
 	reader *kafka.Reader
 
 	service *service.WBLevel0Service
@@ -19,7 +17,6 @@ type Consumer struct {
 
 func ProvideConsumer(ctx context.Context, cfg *Config, service *service.WBLevel0Service) *Consumer {
 	return &Consumer{
-		ctx: ctx,
 		reader: kafka.NewReader(kafka.ReaderConfig{
 			Brokers:   cfg.Brokers,
 			GroupID:   cfg.GroupID,
@@ -31,33 +28,33 @@ func ProvideConsumer(ctx context.Context, cfg *Config, service *service.WBLevel0
 	}
 }
 
-func (c *Consumer) Fetch() (kafka.Message, error) {
-	return c.reader.FetchMessage(c.ctx)
+func (c *Consumer) Fetch(ctx context.Context) (kafka.Message, error) {
+	return c.reader.FetchMessage(ctx)
 }
 
-func (c *Consumer) Consume() {
+func (c *Consumer) Consume(ctx context.Context) {
 	for {
-		msg, err := c.Fetch()
+		msg, err := c.Fetch(ctx)
 		if err != nil {
 			if err == context.Canceled || err == io.EOF {
 				// TODO: consumer was closed
-				log.Printf("consumer stopped: %v", err)
+				log.Println("[kafka] канал закрыт")
 				return
 			}
-			log.Printf("failed to read message: %v", err)
+			log.Printf("[kafka] ошибка получения сообщения %v\n", err)
 			continue
 		}
 
-		fmt.Printf("message: %s\n", msg.Value)
+		c.service.CreateOrder(ctx, msg.Value)
 
-		if err := c.Commit(); err != nil {
-			log.Printf("failed to commit message: %v", err)
+		if err := c.Commit(ctx); err != nil {
+			log.Printf("[kafka] ошибка коммита %v\n", err)
 		}
 	}
 }
 
-func (c *Consumer) Commit() error {
-	return c.reader.CommitMessages(c.ctx)
+func (c *Consumer) Commit(ctx context.Context) error {
+	return c.reader.CommitMessages(ctx)
 }
 
 func (c *Consumer) Close() error {

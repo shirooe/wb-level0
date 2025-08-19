@@ -32,7 +32,7 @@ func Module() fx.Option {
 					go func() {
 						if err := server.Serve(ln); err != nil {
 							// TODO: Error starting or closing listener
-							log.Fatalf("failed to start server: %v", err)
+							log.Println("[http] закрытие сервера")
 						}
 					}()
 					return nil

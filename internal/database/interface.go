@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -38,13 +39,12 @@ type SQLExecer interface {
 }
 
 type NamedExecer interface {
-	ScanOneContext(ctx context.Context, dest interface{}, query Query, args ...interface{}) error
-	ScanAllContext(ctx context.Context, dest interface{}, query Query, args ...interface{}) error
-	// ScanRowContext(ctx context.Context, dest interface{}, query Query, args ...interface{}) error
+	ScanOneContext(ctx context.Context, dest any, query Query, args ...any) error
+	ScanAllContext(ctx context.Context, dest any, query Query, args ...any) error
 }
 
 type QueryExecer interface {
-	QueryRowContext(ctx context.Context, query Query, args ...interface{}) pgx.Row
-	// ExecContext(ctx context.Context, query Query, args ...interface{}) (pgconn.CommandTag, error)
-	// QueryContext(ctx context.Context, query Query, args ...interface{}) (pgx.Rows, error)
+	QueryContext(ctx context.Context, query Query, args ...any) (pgx.Rows, error)
+	QueryRowContext(ctx context.Context, query Query, args ...any) pgx.Row
+	ExecContext(ctx context.Context, query Query, args ...any) (pgconn.CommandTag, error)
 }

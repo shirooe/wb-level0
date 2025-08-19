@@ -9,10 +9,10 @@ import (
 func Module() fx.Option {
 	return fx.Module("kafka",
 		fx.Provide(ProvideConfig, ProvideConsumer),
-		fx.Invoke(func(lc fx.Lifecycle, consumer *Consumer) {
+		fx.Invoke(func(lc fx.Lifecycle, ctx context.Context, consumer *Consumer) {
 			lc.Append(fx.Hook{
-				OnStart: func(ctx context.Context) error {
-					go consumer.Consume()
+				OnStart: func(_ context.Context) error {
+					go consumer.Consume(ctx)
 					return nil
 				},
 				OnStop: func(ctx context.Context) error {

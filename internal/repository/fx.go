@@ -9,10 +9,17 @@ import (
 )
 
 type Repository interface {
+	GetAllOrders(ctx context.Context) ([]models.Order, error)
+
+	GetOrderByID(ctx context.Context, id string) (models.Order, error)
+	GetDeliveryByID(ctx context.Context, id string) (models.Delivery, error)
+	GetPaymentByID(ctx context.Context, id string) (models.Payment, error)
+	GetItemsByID(ctx context.Context, id string) ([]models.Item, error)
+
 	CreateOrder(ctx context.Context, order models.Order) (string, error)
-	CreateItem(ctx context.Context, orderID string, items []models.Item) (string, error)
-	CreatePayment(ctx context.Context, orderID string, payment models.Payment) (string, error)
-	CreateDelivery(ctx context.Context, orderID string, delivery models.Delivery) (string, error)
+	CreateDelivery(ctx context.Context, orderID string, delivery models.Delivery) error
+	CreatePayment(ctx context.Context, orderID string, payment models.Payment) error
+	CreateItems(ctx context.Context, orderID string, items []models.Item) error
 }
 
 type repository struct {

@@ -3,9 +3,15 @@ package database
 import (
 	"context"
 
+	"log"
+
+	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+var _ DB = (*postgres)(nil)
 
 type postgres struct {
 	pool *pgxpool.Pool
@@ -30,26 +36,33 @@ func (p postgres) Close() error {
 	return nil
 }
 
-func (p *postgres) ScanOneContext(ctx context.Context, dest interface{}, query Query, args ...interface{}) error {
-	// rows, err := p.QueryContext(ctx, query, args...)
-	// if err != nil {
-	// log.Error("failed to query %v", err)
-	// return err
-	// }
-	// return pgxscan.ScanOne(dest, rows)
-	return nil
+func (p *postgres) ScanOneContext(ctx context.Context, dest any, query Query, args ...any) error {
+	rows, err := p.QueryContext(ctx, query, args...)
+	if err != nil {
+		log.Printf("[psql] ошибка %v", err)
+		return err
+	}
+
+	return pgxscan.ScanOne(dest, rows)
 }
 
-func (p *postgres) ScanAllContext(ctx context.Context, dest interface{}, query Query, args ...interface{}) error {
-	// rows, err := p.QueryContext(ctx, query, args...)
-	// if err != nil {
-	// 	log.Error("failed to query %v", err)
-	// 	return err
-	// }
-	// return pgxscan.ScanAll(dest, rows)
-	return nil
+func (p *postgres) ScanAllContext(ctx context.Context, dest any, query Query, args ...any) error {
+	rows, err := p.QueryContext(ctx, query, args...)
+	if err != nil {
+		log.Printf("[psql] ошибка %v", err)
+		return err
+	}
+	return pgxscan.ScanAll(dest, rows)
 }
 
-func (p *postgres) QueryRowContext(ctx context.Context, query Query, args ...interface{}) pgx.Row {
+func (p *postgres) QueryRowContext(ctx context.Context, query Query, args ...any) pgx.Row {
 	return p.pool.QueryRow(ctx, query.QueryRaw, args...)
+}
+
+func (p *postgres) QueryContext(ctx context.Context, query Query, args ...any) (pgx.Rows, error) {
+	return p.pool.Query(ctx, query.QueryRaw, args...)
+}
+
+func (p *postgres) ExecContext(ctx context.Context, query Query, args ...any) (pgconn.CommandTag, error) {
+	return p.pool.Exec(ctx, query.QueryRaw, args...)
 }

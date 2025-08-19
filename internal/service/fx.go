@@ -7,12 +7,12 @@ import (
 )
 
 type WBLevel0Service struct {
-	Repository repository.Repository
+	repository repository.Repository
 }
 
 func NewWBLevel0Service(repository repository.Repository) *WBLevel0Service {
 	return &WBLevel0Service{
-		Repository: repository,
+		repository: repository,
 	}
 }
 

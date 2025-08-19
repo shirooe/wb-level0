@@ -1,6 +1,7 @@
 package http
 
 import (
+	"encoding/json"
 	"net/http"
 	"wb-level0/internal/service"
 
@@ -18,16 +19,28 @@ func NewController(service *service.WBLevel0Service) *Controller {
 }
 
 func (c *Controller) RegisterRoutes(mux *mux.Router) {
-	mux.HandleFunc("/order", c.GetAll).Methods("GET")
-	mux.HandleFunc("/order/{id}", c.GetSingle).Methods("GET")
+	mux.HandleFunc("/order/{id}", c.GetOrderByID).Methods("GET")
 }
+func (c *Controller) GetOrderByID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	vars := mux.Vars(r)
+	id := vars["id"]
 
-func (c *Controller) GetAll(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("All OK"))
-	w.WriteHeader(http.StatusOK)
-}
+	order, err := c.service.GetOrderByID(ctx, id)
 
-func (c *Controller) GetSingle(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Single OK"))
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(order)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(data)
 	w.WriteHeader(http.StatusOK)
 }

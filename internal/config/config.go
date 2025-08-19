@@ -9,13 +9,13 @@ import (
 
 func New() *config.YAML {
 	if err := godotenv.Load(".env"); err != nil {
-		log.Fatalf("failed to load env: %v", err)
+		log.Fatalf("[config] ошибка загрузки файла %v", err)
 	}
 
 	provider, err := config.NewYAML(config.File("config/config.yml"))
 
 	if err != nil {
-		log.Fatalf("failed to load config: %v", err)
+		log.Fatalf("[config] ошибка конфигурации %v", err)
 	}
 
 	return provider
