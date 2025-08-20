@@ -2,19 +2,19 @@ package http
 
 import (
 	"context"
-	"log"
 	"net"
 	"net/http"
 	"wb-level0/internal/service"
 
 	"github.com/gorilla/mux"
 	"go.uber.org/fx"
+	"go.uber.org/zap"
 )
 
 func Module() fx.Option {
 	return fx.Module("http",
 		fx.Provide(ProvideConfig, NewServerMux, NewController),
-		fx.Invoke(func(lc fx.Lifecycle, config *Config, mux *mux.Router, controller *Controller, service *service.WBLevel0Service) {
+		fx.Invoke(func(lc fx.Lifecycle, config *Config, mux *mux.Router, controller *Controller, service *service.WBLevel0Service, log *zap.Logger) {
 			controller.RegisterRoutes(mux)
 
 			server := &http.Server{
@@ -32,12 +32,17 @@ func Module() fx.Option {
 					go func() {
 						if err := server.Serve(ln); err != nil {
 							// TODO: Error starting or closing listener
-							log.Println("[http] закрытие сервера")
 						}
 					}()
+
+					if err := service.RestoreOrders(ctx); err != nil {
+						return err
+					}
+
 					return nil
 				},
 				OnStop: func(ctx context.Context) error {
+					log.Info("[http] остановка сервера")
 					return server.Shutdown(ctx)
 				},
 			})

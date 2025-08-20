@@ -28,6 +28,16 @@ func (r *repository) CreateOrder(ctx context.Context, order models.Order) (strin
 		return "", err
 	}
 
+	if err := r.CreateItems(ctx, id, order.Items); err != nil {
+		return "", err
+	}
+	if err := r.CreatePayment(ctx, id, order.Payment); err != nil {
+		return "", err
+	}
+	if err := r.CreateDelivery(ctx, id, order.Delivery); err != nil {
+		return "", err
+	}
+
 	return id, nil
 }
 
@@ -104,6 +114,25 @@ func (r *repository) GetOrderByID(ctx context.Context, id string) (models.Order,
 	if err := r.db.DB().ScanOneContext(ctx, &order, query, args...); err != nil {
 		return models.Order{}, err
 	}
+
+	delivery, err := r.GetDeliveryByID(ctx, id)
+	if err != nil {
+		return models.Order{}, err
+	}
+
+	payment, err := r.GetPaymentByID(ctx, id)
+	if err != nil {
+		return models.Order{}, err
+	}
+
+	items, err := r.GetItemsByID(ctx, id)
+	if err != nil {
+		return models.Order{}, err
+	}
+
+	order.Delivery = delivery
+	order.Payment = payment
+	order.Items = items
 
 	return order, nil
 }

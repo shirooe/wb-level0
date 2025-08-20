@@ -3,16 +3,17 @@ package kafka
 import (
 	"context"
 	"io"
-	"log"
 	"wb-level0/internal/service"
 
 	"github.com/segmentio/kafka-go"
+	"go.uber.org/zap"
 )
 
 type Consumer struct {
 	reader *kafka.Reader
 
 	service *service.WBLevel0Service
+	log     *zap.Logger
 }
 
 func ProvideConsumer(ctx context.Context, cfg *Config, service *service.WBLevel0Service) *Consumer {
@@ -38,17 +39,16 @@ func (c *Consumer) Consume(ctx context.Context) {
 		if err != nil {
 			if err == context.Canceled || err == io.EOF {
 				// TODO: consumer was closed
-				log.Println("[kafka] канал закрыт")
 				return
 			}
-			log.Printf("[kafka] ошибка получения сообщения %v\n", err)
+			c.log.Error("[kafka] ошибка получения сообщения", zap.Error(err))
 			continue
 		}
 
 		c.service.CreateOrder(ctx, msg.Value)
 
 		if err := c.Commit(ctx); err != nil {
-			log.Printf("[kafka] ошибка коммита %v\n", err)
+			c.log.Error("[kafka] ошибка коммита", zap.Error(err))
 		}
 	}
 }

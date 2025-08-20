@@ -3,18 +3,18 @@ package database
 import (
 	"context"
 
-	"log"
-
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"go.uber.org/zap"
 )
 
 var _ DB = (*postgres)(nil)
 
 type postgres struct {
 	pool *pgxpool.Pool
+	log  *zap.Logger
 }
 
 func pg(conn *pgxpool.Pool) *postgres {
@@ -39,7 +39,7 @@ func (p postgres) Close() error {
 func (p *postgres) ScanOneContext(ctx context.Context, dest any, query Query, args ...any) error {
 	rows, err := p.QueryContext(ctx, query, args...)
 	if err != nil {
-		log.Printf("[psql] ошибка %v", err)
+		p.log.Error("[psql] ошибка", zap.Error(err))
 		return err
 	}
 
@@ -49,7 +49,7 @@ func (p *postgres) ScanOneContext(ctx context.Context, dest any, query Query, ar
 func (p *postgres) ScanAllContext(ctx context.Context, dest any, query Query, args ...any) error {
 	rows, err := p.QueryContext(ctx, query, args...)
 	if err != nil {
-		log.Printf("[psql] ошибка %v", err)
+		p.log.Error("[psql] ошибка", zap.Error(err))
 		return err
 	}
 	return pgxscan.ScanAll(dest, rows)

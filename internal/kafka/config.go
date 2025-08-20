@@ -1,6 +1,9 @@
 package kafka
 
-import "go.uber.org/config"
+import (
+	"go.uber.org/config"
+	"go.uber.org/zap"
+)
 
 type Config struct {
 	Brokers   []string `yaml:"brokers"`
@@ -10,11 +13,11 @@ type Config struct {
 	MaxBytes  int      `yaml:"max_bytes"`
 }
 
-func ProvideConfig(provider *config.YAML) *Config {
+func ProvideConfig(provider *config.YAML, log *zap.Logger) *Config {
 	var cfg Config
 
 	if err := provider.Get("kafka").Populate(&cfg); err != nil {
-		panic(err)
+		log.Fatal("[kafka] ошибка конфигурации", zap.Error(err))
 	}
 
 	return &cfg

@@ -2,10 +2,10 @@ package database
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"go.uber.org/config"
+	"go.uber.org/zap"
 )
 
 type Config struct {
@@ -16,11 +16,11 @@ type Config struct {
 	Password string `yaml:"password"`
 }
 
-func ProvideConfig(provider *config.YAML) *Config {
+func ProvideConfig(provider *config.YAML, log *zap.Logger) *Config {
 	var cfg Config
 
 	if err := provider.Get("database").Populate(&cfg); err != nil {
-		log.Fatalf("[Database] Ошибка конфигурации: %v", err)
+		log.Fatal("[database] ошибка конфигурации", zap.Error(err))
 	}
 
 	return &cfg

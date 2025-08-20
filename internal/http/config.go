@@ -4,6 +4,7 @@ import (
 	"net"
 
 	"go.uber.org/config"
+	"go.uber.org/zap"
 )
 
 type Config struct {
@@ -11,11 +12,11 @@ type Config struct {
 	Port string `yaml:"port"`
 }
 
-func ProvideConfig(provider *config.YAML) *Config {
+func ProvideConfig(provider *config.YAML, log *zap.Logger) *Config {
 	var cfg Config
 
 	if err := provider.Get("server").Populate(&cfg); err != nil {
-		panic(err)
+		log.Fatal("[server] ошибка конфигурации", zap.Error(err))
 	}
 
 	return &cfg
