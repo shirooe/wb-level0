@@ -35,10 +35,6 @@ func (s *WBLevel0Service) GetOrderByID(ctx context.Context, id string) (models.O
 
 	order, err := s.repository.GetOrderByID(ctx, id)
 	if err != nil {
-		if handlePgErrors(err) == nil {
-			s.log.Info("[service] заказ не найден", zap.String("order_uid", id), zap.Error(err))
-			return models.Order{}, err
-		}
 		s.log.Info("[service] заказ не получен из базы данных", zap.String("order_uid", id), zap.Error(handlePgErrors(err)))
 		return models.Order{}, err
 	}
