@@ -39,7 +39,7 @@ func (p postgres) Close() error {
 func (p *postgres) ScanOneContext(ctx context.Context, dest any, query Query, args ...any) error {
 	rows, err := p.QueryContext(ctx, query, args...)
 	if err != nil {
-		p.log.Error("[psql] ошибка", zap.Error(err))
+		p.log.Info("[psql] ошибка", zap.Error(err))
 		return err
 	}
 
@@ -49,7 +49,7 @@ func (p *postgres) ScanOneContext(ctx context.Context, dest any, query Query, ar
 func (p *postgres) ScanAllContext(ctx context.Context, dest any, query Query, args ...any) error {
 	rows, err := p.QueryContext(ctx, query, args...)
 	if err != nil {
-		p.log.Error("[psql] ошибка", zap.Error(err))
+		p.log.Info("[psql] ошибка", zap.Error(err))
 		return err
 	}
 	return pgxscan.ScanAll(dest, rows)

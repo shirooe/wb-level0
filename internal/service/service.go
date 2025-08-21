@@ -10,13 +10,13 @@ import (
 func (s *WBLevel0Service) CreateOrder(ctx context.Context, data []byte) (string, error) {
 	order, err := unmarshalToModel[models.Order](data)
 	if err != nil {
-		s.log.Error("[service] ошибка парсинга модели", zap.Error(err))
+		s.log.Info("[service] ошибка парсинга модели", zap.Error(err))
 		return "", err
 	}
 
 	id, err := s.repository.CreateOrder(ctx, order)
 	if err != nil {
-		s.log.Error("[service] заказ не создан", zap.String("order_uid", order.OrderUID), zap.Error(err))
+		s.log.Info("[service] заказ не создан", zap.String("order_uid", order.OrderUID), zap.Error(handlePgErrors(err)))
 		return "", err
 	}
 
@@ -35,7 +35,11 @@ func (s *WBLevel0Service) GetOrderByID(ctx context.Context, id string) (models.O
 
 	order, err := s.repository.GetOrderByID(ctx, id)
 	if err != nil {
-		s.log.Error("[service] заказ не получен из базы данных", zap.String("order_uid", id), zap.Error(err))
+		if handlePgErrors(err) == nil {
+			s.log.Info("[service] заказ не найден", zap.String("order_uid", id), zap.Error(err))
+			return models.Order{}, err
+		}
+		s.log.Info("[service] заказ не получен из базы данных", zap.String("order_uid", id), zap.Error(handlePgErrors(err)))
 		return models.Order{}, err
 	}
 
@@ -48,7 +52,7 @@ func (s *WBLevel0Service) GetOrderByID(ctx context.Context, id string) (models.O
 func (s *WBLevel0Service) RestoreOrders(ctx context.Context) error {
 	orders, err := s.repository.GetAllOrders(ctx)
 	if err != nil {
-		s.log.Error("[service] ошибка восстановления заказов из базы данных", zap.Error(err))
+		s.log.Info("[service] ошибка восстановления заказов из базы данных", zap.Error(handlePgErrors(err)))
 		return err
 	}
 

@@ -41,20 +41,20 @@ func (c *Consumer) Consume(ctx context.Context) {
 				// TODO: consumer was closed
 				return
 			}
-			c.log.Error("[kafka] ошибка получения сообщения", zap.Error(err))
+			c.log.Info("[kafka] ошибка получения сообщения", zap.Error(err))
 			continue
 		}
 
 		c.service.CreateOrder(ctx, msg.Value)
 
-		if err := c.Commit(ctx); err != nil {
-			c.log.Error("[kafka] ошибка коммита", zap.Error(err))
+		if err := c.Commit(ctx, msg); err != nil {
+			c.log.Info("[kafka] ошибка коммита", zap.Error(err))
 		}
 	}
 }
 
-func (c *Consumer) Commit(ctx context.Context) error {
-	return c.reader.CommitMessages(ctx)
+func (c *Consumer) Commit(ctx context.Context, msg kafka.Message) error {
+	return c.reader.CommitMessages(ctx, msg)
 }
 
 func (c *Consumer) Close() error {
