@@ -16,7 +16,7 @@ func ProvideConfig(provider *config.YAML, log *zap.Logger) *Config {
 	var cfg Config
 
 	if err := provider.Get("server").Populate(&cfg); err != nil {
-		log.Fatal("[server] ошибка конфигурации", zap.Error(err))
+		log.Info("[server] ошибка конфигурации", zap.Error(err))
 	}
 
 	return &cfg

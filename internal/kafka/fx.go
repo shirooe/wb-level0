@@ -14,6 +14,7 @@ func Module() fx.Option {
 			lc.Append(fx.Hook{
 				OnStart: func(_ context.Context) error {
 					go consumer.Consume(ctx)
+					log.Info("[kafka] консьюмер запущен")
 					return nil
 				},
 				OnStop: func(ctx context.Context) error {

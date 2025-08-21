@@ -17,7 +17,7 @@ func ProvideConfig(provider *config.YAML, log *zap.Logger) *Config {
 	var cfg Config
 
 	if err := provider.Get("kafka").Populate(&cfg); err != nil {
-		log.Fatal("[kafka] ошибка конфигурации", zap.Error(err))
+		log.Info("[kafka] ошибка конфигурации", zap.Error(err))
 	}
 
 	return &cfg

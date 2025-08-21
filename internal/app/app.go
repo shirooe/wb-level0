@@ -21,7 +21,7 @@ func New() *fx.App {
 			return context.Background()
 		}),
 		fx.Provide(config.New, zap.NewDevelopment),
-		fx.Options(http.Module(), kafka.Module(),
-			service.Module(), repository.Module(), database.Module(), cache.Module()),
+		fx.Options(database.Module(), http.Module(), kafka.Module(),
+			service.Module(), repository.Module(), cache.Module()),
 	)
 }

@@ -39,6 +39,7 @@ func Module() fx.Option {
 						return err
 					}
 
+					log.Info("[http] запуск сервера")
 					return nil
 				},
 				OnStop: func(ctx context.Context) error {
