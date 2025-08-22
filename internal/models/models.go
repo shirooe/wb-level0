@@ -3,58 +3,58 @@ package models
 import "time"
 
 type Order struct {
-	OrderUID          string    `json:"order_uid"`
-	TrackNumber       string    `json:"track_number"`
-	Entry             string    `json:"entry"`
-	Delivery          Delivery  `json:"delivery"`
-	Payment           Payment   `json:"payment"`
-	Items             []Item    `json:"items"`
-	Locale            string    `json:"locale"`
+	OrderUID          string    `json:"order_uid" validate:"required,min=10,max=50"`
+	TrackNumber       string    `json:"track_number" validate:"required,min=1,max=50"`
+	Entry             string    `json:"entry" validate:"required,min=1,max=10"`
+	Delivery          Delivery  `json:"delivery" validate:"required"`
+	Payment           Payment   `json:"payment" validate:"required"`
+	Items             []Item    `json:"items" validate:"required,min=1,dive"`
+	Locale            string    `json:"locale" validate:"required,len=2"`
 	InternalSignature string    `json:"internal_signature"`
-	CustomerID        string    `json:"customer_id"`
-	DeliveryService   string    `json:"delivery_service"`
-	Shardkey          string    `json:"shardkey"`
-	SmID              int       `json:"sm_id"`
-	DateCreated       time.Time `json:"date_created"`
-	OofShard          string    `json:"oof_shard"`
+	CustomerID        string    `json:"customer_id" validate:"required"`
+	DeliveryService   string    `json:"delivery_service" validate:"required,min=1,max=50"`
+	Shardkey          string    `json:"shardkey" validate:"required,min=1,max=10"`
+	SmID              int       `json:"sm_id" validate:"required,gt=0"`
+	DateCreated       time.Time `json:"date_created" validate:"required"`
+	OofShard          string    `json:"oof_shard" validate:"required,min=1,max=10"`
 }
 
 type Delivery struct {
 	OrderUID string `json:"order_uid"`
-	Name     string `json:"name"`
-	Phone    string `json:"phone"`
-	Zip      string `json:"zip"`
-	City     string `json:"city"`
-	Address  string `json:"address"`
-	Region   string `json:"region"`
-	Email    string `json:"email"`
+	Name     string `json:"name" validate:"required,min=2,max=100"`
+	Phone    string `json:"phone" validate:"required,e164"`
+	Zip      string `json:"zip" validate:"required,min=5,max=10"`
+	City     string `json:"city" validate:"required,min=2,max=50"`
+	Address  string `json:"address" validate:"required,min=5,max=200"`
+	Region   string `json:"region" validate:"required,min=2,max=50"`
+	Email    string `json:"email" validate:"required,email"`
 }
 
 type Payment struct {
 	OrderUID     string `json:"order_uid"`
-	Transaction  string `json:"transaction"`
+	Transaction  string `json:"transaction" validate:"required"`
 	RequestID    string `json:"request_id"`
-	Currency     string `json:"currency"`
-	Provider     string `json:"provider"`
-	Amount       int    `json:"amount"`
-	PaymentDt    int    `json:"payment_dt"`
-	Bank         string `json:"bank"`
-	DeliveryCost int    `json:"delivery_cost"`
-	GoodsTotal   int    `json:"goods_total"`
-	CustomFee    int    `json:"custom_fee"`
+	Currency     string `json:"currency" validate:"required,len=3,uppercase"`
+	Provider     string `json:"provider" validate:"required,min=1,max=50"`
+	Amount       int    `json:"amount" validate:"required,gt=0"`
+	PaymentDt    int    `json:"payment_dt" validate:"required,gt=0"`
+	Bank         string `json:"bank" validate:"required,min=2,max=50"`
+	DeliveryCost int    `json:"delivery_cost" validate:"gte=0"`
+	GoodsTotal   int    `json:"goods_total" validate:"required,gt=0"`
+	CustomFee    int    `json:"custom_fee" validate:"gte=0"`
 }
 
 type Item struct {
 	OrderUID    string `json:"order_uid"`
-	ChrtID      int    `json:"chrt_id"`
-	TrackNumber string `json:"track_number"`
-	Price       int    `json:"price"`
-	Rid         string `json:"rid"`
-	Name        string `json:"name"`
-	Sale        int    `json:"sale"`
-	Size        string `json:"size"`
-	TotalPrice  int    `json:"total_price"`
-	NmID        int    `json:"nm_id"`
-	Brand       string `json:"brand"`
-	Status      int    `json:"status"`
+	ChrtID      int    `json:"chrt_id" validate:"required,gt=0"`
+	TrackNumber string `json:"track_number" validate:"required,min=1,max=50"`
+	Price       int    `json:"price" validate:"required,gt=0"`
+	Rid         string `json:"rid" validate:"required"`
+	Name        string `json:"name" validate:"required,min=1,max=200"`
+	Sale        int    `json:"sale" validate:"gte=0,lte=100"`
+	Size        string `json:"size" validate:"required,min=1,max=10"`
+	TotalPrice  int    `json:"total_price" validate:"required,gt=0"`
+	NmID        int    `json:"nm_id" validate:"required,gt=0"`
+	Brand       string `json:"brand" validate:"required,min=1,max=100"`
+	Status      int    `json:"status" validate:"required,gte=0"`
 }

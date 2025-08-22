@@ -14,6 +14,11 @@ func (s *WBLevel0Service) CreateOrder(ctx context.Context, data []byte) (string,
 		return "", err
 	}
 
+	if err := validate.Struct(order); err != nil {
+		s.log.Info("[service] ошибка валидации заказа", zap.Error(err))
+		return "", err
+	}
+
 	id, err := s.repository.CreateOrder(ctx, order)
 	if err != nil {
 		s.log.Info("[service] заказ не создан", zap.String("order_uid", order.OrderUID), zap.Error(handlePgErrors(err)))

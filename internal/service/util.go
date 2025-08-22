@@ -5,9 +5,12 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 )
+
+var validate = validator.New(validator.WithRequiredStructEnabled())
 
 func unmarshalToModel[T any](data []byte) (T, error) {
 	var zero T
