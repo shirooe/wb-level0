@@ -24,8 +24,8 @@ CREATE TABLE IF NOT EXISTS delivery (
 );
 
 CREATE TABLE IF NOT EXISTS payment (
-  "order_uid" varchar primary key,
-  "transaction" varchar,
+  "transaction" varchar primary key,
+  "order_uid" varchar,
   "request_id" varchar,
   "currency" varchar,
   "provider" varchar,
@@ -38,7 +38,8 @@ CREATE TABLE IF NOT EXISTS payment (
 );
 
 CREATE TABLE IF NOT EXISTS items (
-  "order_uid" varchar primary key,
+  "item_id" serial primary key,
+  "order_uid" varchar,
   "chrt_id" int,
   "track_number" varchar,
   "price" int,
