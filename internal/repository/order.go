@@ -60,37 +60,23 @@ func (r *repository) GetAllOrders(ctx context.Context) ([]models.Order, error) {
 	}
 	defer rows.Close()
 
+	// FIX ME
 	for rows.Next() {
 		var order_uid string
 		if err := rows.Scan(&order_uid); err != nil {
-			return nil, err
+			continue
 		}
 
 		order, err := r.GetOrderByID(ctx, order_uid)
 		if err != nil {
-			return nil, err
+			continue
 		}
-
-		delivery, err := r.GetDeliveryByID(ctx, order_uid)
-		if err != nil {
-			return nil, err
-		}
-
-		payment, err := r.GetPaymentByID(ctx, order_uid)
-		if err != nil {
-			return nil, err
-		}
-
-		items, err := r.GetItemsByID(ctx, order_uid)
-		if err != nil {
-			return nil, err
-		}
-
-		order.Delivery = delivery
-		order.Payment = payment
-		order.Items = items
 
 		orders = append(orders, order)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return orders, nil

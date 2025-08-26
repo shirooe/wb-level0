@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"wb-level0/internal/service"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -18,8 +19,12 @@ func Module() fx.Option {
 			controller.RegisterRoutes(mux)
 
 			server := &http.Server{
-				Addr:    config.Address(),
-				Handler: mux,
+				Addr: config.Address(),
+				Handler: handlers.CORS(
+					handlers.AllowedOrigins([]string{"*"}),
+					handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS"}),
+					handlers.AllowedHeaders([]string{"*"}),
+				)(mux),
 			}
 
 			lc.Append(fx.Hook{

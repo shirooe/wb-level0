@@ -14,7 +14,6 @@ COPY --from=builder /app/api .
 COPY .env .env
 COPY config config
 COPY migrations migrations
-
-EXPOSE 3000
+COPY static static
 
 CMD ["./api"]
