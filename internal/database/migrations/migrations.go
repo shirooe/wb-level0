@@ -21,6 +21,7 @@ func (m *Migrations) Up(dsn string) error {
 	if err != nil {
 		return err
 	}
+	defer driver.Close()
 
 	migrator, err := migrate.NewWithDatabaseInstance("file://migrations/", "postgres", driver)
 	if err != nil {
@@ -46,6 +47,7 @@ func (m *Migrations) Down(dsn string) error {
 	if err != nil {
 		return err
 	}
+	defer driver.Close()
 
 	migrator, err := migrate.NewWithDatabaseInstance("file://migrations/", "postgres", driver)
 	if err != nil {
