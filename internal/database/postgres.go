@@ -10,6 +10,10 @@ import (
 	"go.uber.org/zap"
 )
 
+type key string
+
+const TxKey key = "tx"
+
 var _ DB = (*postgres)(nil)
 
 type postgres struct {
@@ -56,13 +60,33 @@ func (p *postgres) ScanAllContext(ctx context.Context, dest any, query Query, ar
 }
 
 func (p *postgres) QueryRowContext(ctx context.Context, query Query, args ...any) pgx.Row {
+	tx, ok := ctx.Value(TxKey).(pgx.Tx)
+
+	if ok {
+		return tx.QueryRow(ctx, query.QueryRaw, args...)
+	}
+
 	return p.pool.QueryRow(ctx, query.QueryRaw, args...)
 }
 
 func (p *postgres) QueryContext(ctx context.Context, query Query, args ...any) (pgx.Rows, error) {
+	tx, ok := ctx.Value(TxKey).(pgx.Tx)
+	if ok {
+		return tx.Query(ctx, query.QueryRaw, args...)
+	}
+
 	return p.pool.Query(ctx, query.QueryRaw, args...)
 }
 
 func (p *postgres) ExecContext(ctx context.Context, query Query, args ...any) (pgconn.CommandTag, error) {
+	tx, ok := ctx.Value(TxKey).(pgx.Tx)
+	if ok {
+		return tx.Exec(ctx, query.QueryRaw, args...)
+	}
+
 	return p.pool.Exec(ctx, query.QueryRaw, args...)
+}
+
+func (p *postgres) BeginTx(ctx context.Context, txOptions pgx.TxOptions) (pgx.Tx, error) {
+	return p.pool.BeginTx(ctx, txOptions)
 }

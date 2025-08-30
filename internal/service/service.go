@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 	"wb-level0/internal/models"
 
 	"go.uber.org/zap"
@@ -19,13 +20,42 @@ func (s *WBLevel0Service) CreateOrder(ctx context.Context, data []byte) (string,
 		return "", err
 	}
 
-	id, err := s.repository.CreateOrder(ctx, order)
+	var id string
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, time.Second*1)
+	defer cancel()
+
+	err = s.manager.WithTransaction(ctxWithTimeout, func(ctx context.Context) error {
+		var errorTx error
+
+		id, errorTx = s.repository.CreateOrder(ctxWithTimeout, order)
+		if errorTx != nil {
+			return errorTx
+		}
+
+		errorTx = s.repository.CreateDelivery(ctxWithTimeout, id, order.Delivery)
+		if errorTx != nil {
+			return errorTx
+		}
+
+		errorTx = s.repository.CreatePayment(ctxWithTimeout, id, order.Payment)
+		if errorTx != nil {
+			return errorTx
+
+		}
+
+		errorTx = s.repository.CreateItems(ctxWithTimeout, id, order.Items)
+		if errorTx != nil {
+			return errorTx
+		}
+
+		return nil
+	})
+
 	if err != nil {
-		s.log.Info("[service] заказ не создан", zap.String("order_uid", order.OrderUID), zap.Error(handlePgErrors(err)))
 		return "", err
 	}
 
-	s.log.Info("[service] заказ создан", zap.String("order_uid", order.OrderUID))
+	s.log.Info("[service] заказ создан", zap.String("order_uid", id))
 	s.cache.Set(id, order)
 	s.log.Info("[service] кэш заказов обновлен")
 	return id, nil

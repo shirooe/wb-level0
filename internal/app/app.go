@@ -5,6 +5,7 @@ import (
 	"wb-level0/internal/cache"
 	"wb-level0/internal/config"
 	"wb-level0/internal/database"
+	"wb-level0/internal/database/transaction"
 	"wb-level0/internal/http"
 	"wb-level0/internal/kafka"
 	"wb-level0/internal/repository"
@@ -22,6 +23,6 @@ func New() *fx.App {
 		}),
 		fx.Provide(config.New, zap.NewDevelopment),
 		fx.Options(database.Module(), http.Module(), kafka.Module(),
-			service.Module(), repository.Module(), cache.Module()),
+			service.Module(), repository.Module(), transaction.Module(), cache.Module()),
 	)
 }

@@ -24,17 +24,7 @@ func (r *repository) CreateOrder(ctx context.Context, order models.Order) (strin
 	}
 
 	var id string
-	if err := r.db.DB().QueryRowContext(ctx, query, args...).Scan(&id); err != nil {
-		return "", err
-	}
-
-	if err := r.CreateItems(ctx, id, order.Items); err != nil {
-		return "", err
-	}
-	if err := r.CreatePayment(ctx, id, order.Payment); err != nil {
-		return "", err
-	}
-	if err := r.CreateDelivery(ctx, id, order.Delivery); err != nil {
+	if err := r.db.DB().ScanOneContext(ctx, &id, query, args...); err != nil {
 		return "", err
 	}
 

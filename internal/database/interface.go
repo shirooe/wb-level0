@@ -10,6 +10,7 @@ import (
 
 type DB interface {
 	SQLExecer
+	Transactor
 
 	Pooler
 	Pinger
@@ -48,3 +49,9 @@ type QueryExecer interface {
 	QueryRowContext(ctx context.Context, query Query, args ...any) pgx.Row
 	ExecContext(ctx context.Context, query Query, args ...any) (pgconn.CommandTag, error)
 }
+
+type Transactor interface {
+	BeginTx(ctx context.Context, txOptions pgx.TxOptions) (pgx.Tx, error)
+}
+
+type Handler func(ctx context.Context) error
