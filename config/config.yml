@@ -1,0 +1,14 @@
+server:
+  host: 0.0.0.0
+  port: 3000
+
+database:
+  host: postgres
+  port: 5432
+
+kafka: 
+  brokers: [kafka:9092]
+  topic: order-topic
+  group_id: order-group
+  partition: 0
+  max_bytes: 1000000
