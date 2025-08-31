@@ -52,6 +52,7 @@ func (s *WBLevel0Service) CreateOrder(ctx context.Context, data []byte) (string,
 	})
 
 	if err != nil {
+		s.log.Info("[service] ошибка создания заказа", zap.Error(handlePgErrors(err)))
 		return "", err
 	}
 

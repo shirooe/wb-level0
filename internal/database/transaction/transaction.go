@@ -34,8 +34,6 @@ func (m *Manager) transaction(ctx context.Context, opts pgx.TxOptions, fn databa
 	}()
 
 	if err := fn(ctx); err != nil {
-		m.log.Error("[psql] ошибка при выполнении транзакции", zap.Error(err))
-		err = errors.Join(err, fmt.Errorf("[psql] ошибка при выполнении транзакции %v", err))
 		return err
 	}
 
