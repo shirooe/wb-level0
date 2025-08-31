@@ -3,6 +3,8 @@ package kafka
 import (
 	"context"
 	"io"
+	"net"
+	"strconv"
 	"wb-level0/internal/service"
 
 	"github.com/segmentio/kafka-go"
@@ -59,4 +61,31 @@ func (c *Consumer) Commit(ctx context.Context, msg kafka.Message) error {
 
 func (c *Consumer) Close() error {
 	return c.reader.Close()
+}
+
+func (c *Consumer) CreateTopic(config *Config) {
+	conn, err := kafka.Dial("tcp", config.Brokers[0])
+	if err != nil {
+		c.log.Error("[kafka] ошибка подключения к брокеру", zap.Error(err))
+	}
+	defer conn.Close()
+
+	controller, err := conn.Controller()
+	if err != nil {
+		c.log.Error("[kafka] ошибка получения контроллера", zap.Error(err))
+	}
+
+	controllerConn, err := kafka.Dial("tcp", net.JoinHostPort(controller.Host, strconv.Itoa(controller.Port)))
+	if err != nil {
+		c.log.Error("[kafka] ошибка подключения к контроллеру", zap.Error(err))
+	}
+	defer controllerConn.Close()
+
+	if err := controllerConn.CreateTopics(kafka.TopicConfig{
+		Topic:             config.Topic,
+		NumPartitions:     1,
+		ReplicationFactor: 1,
+	}); err != nil {
+		c.log.Error("[kafka] ошибка создания топика", zap.Error(err))
+	}
 }
