@@ -1,10 +1,11 @@
-package kafka
+package consumer
 
 import (
 	"context"
 	"io"
 	"net"
 	"strconv"
+	"wb-level0/internal/kafka/config"
 	"wb-level0/internal/service"
 
 	"github.com/segmentio/kafka-go"
@@ -18,7 +19,7 @@ type Consumer struct {
 	log     *zap.Logger
 }
 
-func ProvideConsumer(ctx context.Context, cfg *Config, service *service.WBLevel0Service) *Consumer {
+func ProvideConsumer(ctx context.Context, cfg *config.Config, service *service.WBLevel0Service, log *zap.Logger) *Consumer {
 	return &Consumer{
 		reader: kafka.NewReader(kafka.ReaderConfig{
 			Brokers:   cfg.Brokers,
@@ -28,6 +29,7 @@ func ProvideConsumer(ctx context.Context, cfg *Config, service *service.WBLevel0
 			MaxBytes:  cfg.MaxBytes,
 		}),
 		service: service,
+		log:     log,
 	}
 }
 
@@ -63,7 +65,7 @@ func (c *Consumer) Close() error {
 	return c.reader.Close()
 }
 
-func (c *Consumer) CreateTopic(config *Config) {
+func (c *Consumer) CreateTopic(config *config.Config) {
 	conn, err := kafka.Dial("tcp", config.Brokers[0])
 	if err != nil {
 		c.log.Error("[kafka] ошибка подключения к брокеру", zap.Error(err))

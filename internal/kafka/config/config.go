@@ -1,4 +1,4 @@
-package kafka
+package config
 
 import (
 	"go.uber.org/config"

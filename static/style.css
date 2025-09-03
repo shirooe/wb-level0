@@ -49,8 +49,16 @@ button {
   width: 100%;
 }
 
+button.test_button {
+  background-color: #28a745;
+}
+
 button:hover {
   background-color: #0056b3;
+}
+
+button.test_button:hover {
+  background-color: #218838;
 }
 
 button:disabled {
