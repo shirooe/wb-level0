@@ -10,8 +10,10 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
+// валидация структур
 var validate = validator.New(validator.WithRequiredStructEnabled())
 
+// unmarshal в структуру заказа
 func unmarshalToModel[T any](data []byte) (T, error) {
 	var zero T
 	if len(data) == 0 {
@@ -26,6 +28,7 @@ func unmarshalToModel[T any](data []byte) (T, error) {
 	return model, nil
 }
 
+// обработка ошибок postgres
 func handlePgErrors(err error) error {
 	var pgErr *pgconn.PgError
 

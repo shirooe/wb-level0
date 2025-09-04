@@ -16,6 +16,7 @@ func NewCache() *Cache {
 	}
 }
 
+// создание модуля cache
 func Module() fx.Option {
 	return fx.Module("cache",
 		fx.Provide(NewCache),

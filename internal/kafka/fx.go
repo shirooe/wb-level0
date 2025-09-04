@@ -8,6 +8,7 @@ import (
 	"go.uber.org/fx"
 )
 
+// объединение модулей и провайд конфига в них
 func Module() fx.Option {
 	return fx.Options(
 		consumer.Module(),

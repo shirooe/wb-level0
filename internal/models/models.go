@@ -2,6 +2,7 @@ package models
 
 import "time"
 
+// модели данных для json и валидации данных
 type Order struct {
 	OrderUID          string    `json:"order_uid" validate:"required,min=10,max=50"`
 	TrackNumber       string    `json:"track_number" validate:"required,min=1,max=50"`

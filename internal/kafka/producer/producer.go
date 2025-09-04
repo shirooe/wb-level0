@@ -14,6 +14,7 @@ type Producer struct {
 	log    *zap.Logger
 }
 
+// создание продьюсера
 func ProvideProducer(ctx context.Context, cfg *config.Config, log *zap.Logger) *Producer {
 	return &Producer{
 		writer: &kafka.Writer{
@@ -24,6 +25,7 @@ func ProvideProducer(ctx context.Context, cfg *config.Config, log *zap.Logger) *
 	}
 }
 
+// отправка сообщении в топик
 func (p *Producer) WriteTestMessage(data []byte) error {
 	if err := p.writer.WriteMessages(context.Background(), kafka.Message{
 		Key:   []byte("test"),
@@ -37,6 +39,7 @@ func (p *Producer) WriteTestMessage(data []byte) error {
 	return nil
 }
 
+// закрытие
 func (p *Producer) Close() error {
 	return p.writer.Close()
 }

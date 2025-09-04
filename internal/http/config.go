@@ -12,6 +12,7 @@ type Config struct {
 	Port string `yaml:"port"`
 }
 
+// получение провайдера и маппинг данных в структуру из yml-файла по ключу server
 func ProvideConfig(provider *config.YAML, log *zap.Logger) *Config {
 	var cfg Config
 
@@ -22,6 +23,7 @@ func ProvideConfig(provider *config.YAML, log *zap.Logger) *Config {
 	return &cfg
 }
 
+// объединение Config.Host и Config.Port
 func (c *Config) Address() string {
 	return net.JoinHostPort(c.Host, c.Port)
 }

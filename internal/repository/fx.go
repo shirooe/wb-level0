@@ -32,6 +32,7 @@ func NewRepository(db *database.Client) Repository {
 	}
 }
 
+// регистрация модуля
 func Module() fx.Option {
 	return fx.Module("repository",
 		fx.Provide(NewRepository))

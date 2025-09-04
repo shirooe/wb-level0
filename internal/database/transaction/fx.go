@@ -12,6 +12,7 @@ type Manager struct {
 	log *zap.Logger
 }
 
+// создание менеджера транзакции
 func NewManager(db *database.Client, log *zap.Logger) *Manager {
 	return &Manager{
 		db:  db,

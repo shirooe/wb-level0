@@ -15,12 +15,16 @@ import (
 	"go.uber.org/zap"
 )
 
+// регистрация необходимых модулей
 func New() *fx.App {
 	return fx.New(
+		// отключение логгера fx
 		fx.NopLogger,
+		// регистрация контекст для других приложении
 		fx.Provide(func() context.Context {
 			return context.Background()
 		}),
+		// регистрация конфига и логгера zap
 		fx.Provide(config.New, zap.NewDevelopment),
 		fx.Options(database.Module(), http.Module(), kafka.Module(),
 			service.Module(), repository.Module(), transaction.Module(), cache.Module()),

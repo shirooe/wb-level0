@@ -13,6 +13,7 @@ type Config struct {
 	MaxBytes  int      `yaml:"max_bytes"`
 }
 
+// получение провайдера и маппинг данных в структуру из yml-файла по ключу kafka
 func ProvideConfig(provider *config.YAML, log *zap.Logger) *Config {
 	var cfg Config
 

@@ -25,6 +25,7 @@ func NewWBLevel0Service(repository repository.Repository, manager *transaction.M
 	}
 }
 
+// регистрация модуля
 func Module() fx.Option {
 	return fx.Module("service",
 		fx.Provide(NewWBLevel0Service))

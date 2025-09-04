@@ -8,7 +8,9 @@ import (
 	"github.com/elgris/sqrl"
 )
 
+// создание оплаты
 func (r *repository) CreatePayment(ctx context.Context, orderID string, payment models.Payment) error {
+	// создание sql строки и аргументов к нему
 	sql, args, err := sqrl.Insert("payment").PlaceholderFormat(sqrl.Dollar).Columns("order_uid", "transaction", "request_id", "currency", "provider",
 		"amount", "payment_dt", "bank", "delivery_cost", "goods_total", "custom_fee").
 		Values(orderID, payment.Transaction, payment.RequestID, payment.Currency, payment.Provider,
@@ -19,16 +21,20 @@ func (r *repository) CreatePayment(ctx context.Context, orderID string, payment 
 		return err
 	}
 
+	// создание структуры запроса
 	query := database.Query{
 		Name:     "CreatePayment",
 		QueryRaw: sql,
 	}
 
+	// выполнение запроса
 	r.db.DB().QueryRowContext(ctx, query, args...)
 	return nil
 }
 
+// поиск оплаты по order_uid
 func (r *repository) GetPaymentByID(ctx context.Context, id string) (models.Payment, error) {
+	// создание sql строки и аргументов к нему
 	sql, args, err := sqrl.Select("order_uid", "transaction", "request_id", "currency", "provider",
 		"amount", "payment_dt", "bank", "delivery_cost", "goods_total", "custom_fee").
 		PlaceholderFormat(sqrl.Dollar).From("payment").Where(sqrl.Eq{"order_uid": id}).ToSql()
@@ -37,15 +43,18 @@ func (r *repository) GetPaymentByID(ctx context.Context, id string) (models.Paym
 		return models.Payment{}, err
 	}
 
+	// создание структуры запроса
 	query := database.Query{
 		Name:     "GetPayment",
 		QueryRaw: sql,
 	}
 
+	// сканирование оплаты в структуру
 	var payment models.Payment
 	if err := r.db.DB().ScanOneContext(ctx, &payment, query, args...); err != nil {
 		return models.Payment{}, err
 	}
 
+	// возвращение данных
 	return payment, nil
 }

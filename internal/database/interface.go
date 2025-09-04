@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// Функции для взаимодействия
 type DB interface {
 	SQLExecer
 	Transactor

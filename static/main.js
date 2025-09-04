@@ -3,6 +3,7 @@ const testForm = document.querySelector('#test_form');
 const result = document.querySelector('#result');
 const message = document.querySelector('#message');
 
+// поиск по order_uid
 form.addEventListener('submit', (e) => {
   e.preventDefault();
   
@@ -83,6 +84,7 @@ form.addEventListener('submit', (e) => {
   });
 });
 
+// отправка тестовой модели заказа (131 строка)
 testForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
@@ -107,6 +109,7 @@ testForm.addEventListener('submit', (e) => {
   });
 })
 
+// состояние загрузки
 function messageLoadingState() {
   message.classList.remove('success');
   message.classList.remove('error');
@@ -114,12 +117,14 @@ function messageLoadingState() {
   message.innerHTML = 'Loading...'; 
 }
 
+// состояние успешно
 function messageSuccessState(id) {
   message.classList.remove('loading');
   message.classList.add('success');
   message.innerHTML = `Success! Order ID: ${id}`;
 }
 
+// состояние ошибки
 function messageErrorState(error) {
   message.classList.remove('loading');
   message.classList.add('error');

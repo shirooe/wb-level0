@@ -16,6 +16,7 @@ type Config struct {
 	Password string `yaml:"password"`
 }
 
+// получение провайдера и маппинг данных в структуру из yml-файла по ключу database
 func ProvideConfig(provider *config.YAML, log *zap.Logger) *Config {
 	var cfg Config
 
@@ -26,6 +27,7 @@ func ProvideConfig(provider *config.YAML, log *zap.Logger) *Config {
 	return &cfg
 }
 
+// DSN для подключения к БД
 func (c *Config) DSN() string {
 	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		c.Host, c.Port, os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_DB"))
